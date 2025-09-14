@@ -1,0 +1,66 @@
+FROM alpine:3.21
+
+WORKDIR /root
+
+# Install base development tools and dependencies
+RUN apk update && apk add --no-cache \
+    clang \
+    binutils-dev \
+    uthash-dev \
+    elfutils-dev \
+    capstone-dev \
+    readline-dev \
+    gsl-dev \
+    build-base \
+    git \
+    file \
+    cargo \
+    openssh \
+    apache2 \
+    nginx \
+    gcc \
+    g++ \
+    make \
+    cmake \
+    linux-headers \
+    musl-dev \
+    libbpf-dev \
+    wget \
+    curl
+
+# Additional libraries for WCC
+RUN apk add --no-cache \
+    glib-dev \
+    dbus-dev \
+    device-mapper \
+    kmod \
+    newt \
+    popt \
+    sudo \
+    openrc \
+    iptables
+
+
+# Add missing dependencies
+RUN apk add --no-cache libunwind-dev    
+RUN apk add --no-cache perl
+RUN apk add --no-cache bash
+
+# Build wcc & install it
+RUN git clone https://github.com/endrazine/wcc.git && \
+    cd wcc && \
+    git submodule init && \
+    git submodule update && \
+    make && \
+    make install
+
+RUN cp /usr/sbin/httpd /usr/sbin/apache2
+
+WORKDIR /root/
+COPY apache_relink.tgz .
+RUN tar -xvzf apache_relink.tgz
+WORKDIR /root/apache_relink
+
+RUN make
+
+CMD ["/bin/bash"]

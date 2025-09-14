@@ -1,0 +1,29 @@
+FROM ubuntu:14.04
+
+ENV DEBIAN_FRONTEND="noninteractive"
+
+RUN apt update
+RUN apt install -y sudo nano gdb proftpd apache2 build-essential git
+
+RUN apt install -y clang uthash-dev libreadline-dev libiberty-dev build-essential git debootstrap file
+RUN apt install -y binutils-dev
+RUN apt install -y libelf-dev
+#RUN apt install -y libcapstone
+
+# libelf-dev  libcapstone-dev libgsl-dev
+
+RUN git clone https://github.com/capstone-engine/capstone.git && cd capstone && ./cmake.sh && ./make.sh install
+
+WORKDIR /tmp/
+RUN git clone https://github.com/endrazine/wcc.git
+WORKDIR /tmp/wcc/
+RUN git checkout 0.0.10 && git submodule init && git submodule update && make -i && make install -i
+
+WORKDIR /root/
+COPY apache_relink.tgz .
+RUN tar -xvzf apache_relink.tgz
+WORKDIR /root/apache_relink
+
+RUN make
+
+CMD ["/bin/bash"]
