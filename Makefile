@@ -2,6 +2,8 @@ all::
 	./build-all.sh
 
 test::
+	docker run -it --user 0 wcc:26.10 bash -c "./ap2loglevel info"
+	docker run -it --user 0 wcc:26.04 bash -c "./ap2loglevel info"
 	docker run -it --user 0 wcc:24.04 bash -c "./ap2loglevel info"
 	docker run -it --user 0 wcc:22.04 bash -c "./ap2loglevel info"
 	docker run -it --user 0 wcc:20.04 bash -c "./ap2loglevel info"
